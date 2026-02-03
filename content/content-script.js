@@ -744,6 +744,14 @@ async function mountSwitcher() {
     closeForm();
   });
 
+  const stopShortcutPropagation = event => {
+    event.stopPropagation();
+  };
+
+  ['keydown', 'keyup', 'keypress'].forEach(eventName => {
+    ui.formInput.addEventListener(eventName, stopShortcutPropagation);
+  });
+
   document.addEventListener('click', event => {
     if (!event.composedPath().includes(root)) {
       ui.panel.classList.remove('open');
