@@ -1,5 +1,7 @@
 # BEAT
 
+[![Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/jmeltz)
+
 BEAT (Browser Extension for Account Toggling) lets you save, switch, and manage multiple SoundCloud sessions without bouncing through logins each time. It lives in the SoundCloud navbar and restores your session with one click.
 
 ## Features

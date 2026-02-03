@@ -1,8 +1,9 @@
 {
   "manifest_version": 3,
   "name": "BEAT",
+  "short_name": "BEAT",
   "version": "1.0.0",
-  "description": "BEAT (Browser Extension for Account Toggling) for SoundCloud sessions",
+  "description": "BEAT (Browser Extension for Account Toggling) for SoundCloud",
   "permissions": [
     "cookies",
     "storage",
@@ -17,6 +18,7 @@
     "service_worker": "background/service-worker.js"
   },
   "action": {
+    "default_title": "BEAT",
     "default_popup": "popup/popup.html",
     "default_icon": {
       "16": "icons/icon16.png",
@@ -27,7 +29,10 @@
   },
   "content_scripts": [
     {
-      "matches": ["*://*.soundcloud.com/*"],
+      "matches": [
+        "*://soundcloud.com/*",
+        "*://*.soundcloud.com/*"
+      ],
       "js": ["content/content-script.js"],
       "run_at": "document_idle"
     }
