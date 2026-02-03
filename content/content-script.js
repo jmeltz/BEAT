@@ -295,6 +295,29 @@ function createSwitcherUI(root) {
         margin-top: 2px;
       }
 
+      .panel__header-actions {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .panel__kofi {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        color: var(--switcher-panel-muted);
+        text-decoration: none;
+        transition: 0.2s ease;
+      }
+
+      .panel__kofi:hover {
+        background: var(--switcher-hover-soft);
+        color: var(--switcher-panel-text);
+      }
+
       .panel__close {
         background: transparent;
         border: none;
@@ -477,11 +500,18 @@ function createSwitcherUI(root) {
             <div class="panel__title">BEAT</div>
             <div class="panel__subtitle">No active profile detected</div>
           </div>
-          <button class="panel__close" type="button" aria-label="Close">
-            <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
-              <path fill="currentColor" d="M18.3 5.71L12 12l6.3 6.29-1.41 1.42L10.59 13.4 4.3 19.7 2.88 18.3 9.17 12 2.88 5.7 4.3 4.29l6.29 6.3 6.29-6.3z"/>
-            </svg>
-          </button>
+          <div class="panel__header-actions">
+            <a class="panel__kofi" href="https://ko-fi.com/jmeltz" target="_blank" rel="noopener noreferrer" aria-label="Support on Ko-fi" title="Support on Ko-fi">
+              <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                <path fill="currentColor" d="M18 8h1a3 3 0 0 1 0 6h-1v1a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V5h14v3zm-2 0V7H6v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1h2a1 1 0 0 0 0-2h-2z"/>
+              </svg>
+            </a>
+            <button class="panel__close" type="button" aria-label="Close">
+              <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                <path fill="currentColor" d="M18.3 5.71L12 12l6.3 6.29-1.41 1.42L10.59 13.4 4.3 19.7 2.88 18.3 9.17 12 2.88 5.7 4.3 4.29l6.29 6.3 6.29-6.3z"/>
+              </svg>
+            </button>
+          </div>
         </div>
         <div class="panel__list"></div>
         <div class="panel__form">
