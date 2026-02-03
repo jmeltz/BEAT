@@ -11,11 +11,12 @@ BEAT (Browser Extension for Account Toggling) lets you save, switch, and manage 
 
 ## Quickstart
 
-1) Clone the repo.
+1) Clone the repo (or download as .zip and extract)
 2) Open Chrome and go to `chrome://extensions`.
 3) Enable **Developer mode** (top right).
-4) Click **Load unpacked** and select the `soundcloud-account-switcher` folder.
+4) Click **Load unpacked** and select the folder.
 5) Open SoundCloud and use the **Accounts** pill in the top bar.
+6) **IMPORTANT**: Avoid using SoundCloud’s built-in **Logout** button, as this invalides the stored session. Use the **Local Sign Out** button in the **Accounts** pill instead instead.
 
 ## How it works
 
@@ -28,11 +29,6 @@ BEAT stores SoundCloud cookies and site storage (local/session storage) per prof
 - **Rename/delete:** Use the icons on a profile row.
 - **Local Sign Out:** Clears SoundCloud cookies/storage locally without calling `/logout`.
 - **Export/import:** Use the import/export buttons in the extension popup.
-
-## Notes
-
-- Avoid using SoundCloud’s built-in **Logout** if you plan to switch back to a saved profile. Use **Local Sign Out** instead.
-- If switching feels out of sync after a new login, re-save the profile once.
 
 ## Development
 
