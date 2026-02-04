@@ -1,0 +1,20 @@
+BEAT Privacy Policy
+
+BEAT is a Chrome extension that lets you save and restore SoundCloud sessions to switch between accounts.
+
+Data accessed:
+- SoundCloud cookies and site storage (localStorage/sessionStorage) on soundcloud.com.
+
+How it’s used:
+- This data is stored locally on your device in chrome.storage.local to enable switching between saved profiles.
+
+What we don’t do:
+- We do not transmit any user data off-device.
+- We do not sell or share user data with third parties.
+- We do not use data for advertising or tracking.
+
+Data retention:
+- Stored locally until you delete profiles or uninstall the extension.
+
+Contact:
+- send@m.essa.ge
