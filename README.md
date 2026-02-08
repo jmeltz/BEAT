@@ -1,5 +1,7 @@
 # BEAT
 
+## Update 2/7/25 - BEAT is now available in the [![Chrome Web Store](https://img.shields.io/badge/Chrome%20Web%20Store-Install-blue?logo=googlechrome&logoColor=white)](https://chromewebstore.google.com/detail/beat/omimamelfkooloclbcofnliamomdfkan)
+
 [![Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/jmeltz)
 
 BEAT (Browser Extension for Account Toggling) lets you save, switch, and manage multiple SoundCloud sessions without bouncing through logins each time. It lives in the SoundCloud navbar and restores your session with one click.
