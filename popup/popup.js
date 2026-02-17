@@ -380,5 +380,40 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
+// Host permission check (Firefox MV3 treats host_permissions as optional)
+const HOST_ORIGINS = ['*://*.soundcloud.com/*', '*://soundcloud.com/*'];
+
+async function ensureHostPermissions() {
+  const granted = await chrome.permissions.contains({ origins: HOST_ORIGINS });
+  if (granted) return true;
+
+  // Show the permission banner and wait for the user to click
+  const banner = document.getElementById('permissionBanner');
+  const btn = document.getElementById('grantPermBtn');
+  banner.style.display = '';
+
+  return new Promise(resolve => {
+    btn.addEventListener('click', async () => {
+      try {
+        const result = await chrome.permissions.request({ origins: HOST_ORIGINS });
+        if (result) {
+          banner.style.display = 'none';
+          resolve(true);
+        } else {
+          showToast('Permission denied — BEAT cannot access cookies', 'error');
+          resolve(false);
+        }
+      } catch (e) {
+        // Chrome may throw if patterns are already granted via host_permissions
+        banner.style.display = 'none';
+        resolve(true);
+      }
+    });
+  });
+}
+
 // Initialize
-loadProfiles();
+(async () => {
+  const ok = await ensureHostPermissions();
+  if (ok) loadProfiles();
+})();

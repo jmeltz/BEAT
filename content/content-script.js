@@ -334,6 +334,8 @@ function createSwitcherUI(root) {
         max-height: 260px;
         overflow-y: auto;
         padding-right: 2px;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
       }
 
       .panel__empty {

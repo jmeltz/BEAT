@@ -15,7 +15,14 @@
     "*://soundcloud.com/*"
   ],
   "background": {
-    "service_worker": "background/service-worker.js"
+    "service_worker": "background/service-worker.js",
+    "scripts": ["background/service-worker.js"]
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "beat@jmeltz.dev",
+      "strict_min_version": "128.0"
+    }
   },
   "action": {
     "default_title": "BEAT",

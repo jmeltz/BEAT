@@ -135,6 +135,8 @@ body {
 .profile-list {
   max-height: 240px;
   overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--sc-gray-dark) var(--sc-card-bg);
 }
 
 .profile-list::-webkit-scrollbar {
@@ -415,6 +417,22 @@ body {
 
 .toast.error {
   background: var(--sc-danger);
+}
+
+/* Permission Banner */
+.permission-banner {
+  background: var(--sc-card-bg);
+  border: 1px solid var(--sc-orange);
+  border-radius: 6px;
+  padding: 16px;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.permission-banner p {
+  font-size: 13px;
+  color: var(--sc-gray-light);
+  margin-bottom: 12px;
 }
 
 /* Loading State */

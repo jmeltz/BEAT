@@ -53,7 +53,6 @@ async function waitForTabComplete(tabId, timeoutMs = 10000) {
 
 // Get all SoundCloud cookies from all subdomains
 async function getCurrentCookies() {
-  // SoundCloud uses multiple subdomains for auth
   const domains = [
     'soundcloud.com',
     '.soundcloud.com',
@@ -75,33 +74,65 @@ async function getCurrentCookies() {
 
   const cookieMap = new Map();
 
+  // Run three query strategies per call, merging results into cookieMap.
+  // Each strategy that throws (unsupported param) is silently skipped.
+  async function getAllMulti(baseQuery) {
+    const strategies = [
+      { label: 'plain', query: baseQuery },
+      { label: 'firstPartyDomain', query: { ...baseQuery, firstPartyDomain: null } },
+      { label: 'partitionKey', query: { ...baseQuery, partitionKey: {} } }
+    ];
+
+    for (const { label, query } of strategies) {
+      try {
+        const cookies = await chrome.cookies.getAll(query);
+        if (cookies.length > 0) {
+          console.log(`[BEAT] getAll(${label}) ${JSON.stringify(baseQuery)} → ${cookies.length} cookies`);
+        }
+        cookies.forEach(cookie => {
+          cookieMap.set(getCookieKey(cookie), cookie);
+        });
+      } catch (e) {
+        // Strategy not supported on this browser — skip
+      }
+    }
+  }
+
   // Get cookies by domain
   for (const domain of domains) {
-    try {
-      const cookies = await chrome.cookies.getAll({ domain });
-      cookies.forEach(cookie => {
-        cookieMap.set(getCookieKey(cookie), cookie);
-      });
-    } catch (e) {
-      // Domain might not have any cookies
-    }
+    await getAllMulti({ domain });
   }
 
   // Also get cookies by URL
   for (const url of urls) {
-    try {
-      const cookies = await chrome.cookies.getAll({ url });
-      cookies.forEach(cookie => {
-        cookieMap.set(getCookieKey(cookie), cookie);
-      });
-    } catch (e) {
-      // URL might not have any cookies
+    await getAllMulti({ url });
+  }
+
+  // Query all cookie stores (Firefox containers, Zen workspaces)
+  try {
+    const stores = await chrome.cookies.getAllCookieStores();
+    for (const store of stores) {
+      if (store.id === '0' || store.id === 'firefox-default') continue; // already covered above
+      console.log(`[BEAT] Querying cookie store: ${store.id}`);
+      for (const domain of domains) {
+        await getAllMulti({ domain, storeId: store.id });
+      }
+      for (const url of urls) {
+        await getAllMulti({ url, storeId: store.id });
+      }
     }
+  } catch (e) {
+    // getAllCookieStores not available or failed
   }
 
   const cookies = Array.from(cookieMap.values());
-  console.log(`Found ${cookies.length} SoundCloud cookies from domains:`,
-    [...new Set(cookies.map(c => c.domain))]);
+  const uniqueDomains = [...new Set(cookies.map(c => c.domain))];
+  const uniqueStores = [...new Set(cookies.map(c => c.storeId).filter(Boolean))];
+  const partitionedCount = cookies.filter(c => c.partitionKey && Object.keys(c.partitionKey).length > 0).length;
+  console.log(`[BEAT] Found ${cookies.length} SoundCloud cookies — domains: [${uniqueDomains}], stores: [${uniqueStores}], partitioned: ${partitionedCount}`);
+  if (cookies.length === 0) {
+    console.warn('[BEAT] Zero cookies found. Check host_permissions and that SoundCloud has been visited.');
+  }
   return cookies;
 }
 
@@ -116,6 +147,7 @@ async function clearAllCookies() {
         url: buildCookieUrl(cookie),
         name: cookie.name
       };
+      maybeSetCookieField(removalDetails, 'firstPartyDomain', cookie.firstPartyDomain);
       maybeSetCookieField(removalDetails, 'partitionKey', cookie.partitionKey);
       maybeSetCookieField(removalDetails, 'storeId', cookie.storeId);
       await chrome.cookies.remove(removalDetails);
@@ -148,9 +180,9 @@ async function setAllCookies(cookies) {
 
     // Handle sameSite - Chrome requires specific values
     // "unspecified" from getAll should be omitted
+    // Firefox may return "none" instead of "unspecified" or "no_restriction"
     if (cookie.sameSite && cookie.sameSite !== 'unspecified') {
-      // "no_restriction" requires secure to be true
-      if (cookie.sameSite === 'no_restriction') {
+      if (cookie.sameSite === 'no_restriction' || cookie.sameSite === 'none') {
         cookieData.sameSite = 'no_restriction';
         cookieData.secure = true;
       } else {
@@ -163,6 +195,7 @@ async function setAllCookies(cookies) {
       cookieData.expirationDate = cookie.expirationDate;
     }
 
+    maybeSetCookieField(cookieData, 'firstPartyDomain', cookie.firstPartyDomain);
     maybeSetCookieField(cookieData, 'sameParty', cookie.sameParty);
     maybeSetCookieField(cookieData, 'priority', cookie.priority);
     maybeSetCookieField(cookieData, 'partitionKey', cookie.partitionKey);
@@ -480,8 +513,16 @@ async function importProfiles(data) {
   return importedProfiles.length;
 }
 
-// Message handler for popup communication
+// Message handler for popup and content script communication
+// NOTE: Firefox requires a single onMessage listener when using async sendResponse.
+// Multiple listeners where one returns true and another returns undefined can cause
+// Firefox to close the message port before the async response is sent.
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === 'pageLoaded' && sender.tab) {
+    console.log('SoundCloud page loaded:', sender.tab.url);
+    return false;
+  }
+
   const handlers = {
     getProfiles: async () => {
       const data = await getProfiles();
@@ -517,12 +558,5 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       .then(result => sendResponse({ success: true, data: result }))
       .catch(error => sendResponse({ success: false, error: error.message }));
     return true; // Keep channel open for async response
-  }
-});
-
-// Listen for content script notifications
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.action === 'pageLoaded' && sender.tab) {
-    console.log('SoundCloud page loaded:', sender.tab.url);
   }
 });
